@@ -2,14 +2,27 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const webpack = require("webpack");
 
 module.exports = (env) => ({
     mode: env.production ? "production" : "development",
     entry: {
       background: "./src/background.ts",
-      demo: "./src/demo.ts"
+      service: "./src/service.ts"
     },
-  
+    
+    resolve: {
+      extensions: [".ts", ".tsx", ".js", ".scss"],
+      fallback: {
+        stream: require.resolve("stream-browserify"),
+        buffer: false
+      },
+      alias: {
+        process: 'process/browser',
+        stream: "stream-browserify",
+        zlib: "browserify-zlib"
+      }
+    },
     output: {
       path: path.resolve(__dirname, './dist'),
       filename: "[name].js"
@@ -51,5 +64,9 @@ module.exports = (env) => ({
           { from: "icon.png", to: "." }
         ],
       }),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer'],
+    }),
     ]
 })
